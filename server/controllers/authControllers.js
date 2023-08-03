@@ -36,30 +36,42 @@ const registerController = async (req, res) => {
 //login controller
 const loginController = async (req,res) => {
     try {
-        const existingUser = await userModel.findOne({ email: req.body.email })
-        if (!existingUser) {
-            return res.status(404).send({
-                sucess: false,
-                messege:'User Not Found'
-         })   
-        }
-        //comapre password
-        const comparePassword = await bcrypt.compare(req.body.password, existingUser.password)
-        if (!comparePassword) {
-            return res.status(500).send({
-                sucess: false,
-                messge:'Invalid Credentials'
-            })
-        }
-        const token = jwt.sign(
-          { existingUserId: existingUser._id },
-            process.env.JWT_SECRET, { expiresIn: '1d' });
-        return res.status(200).send({
-            messege: 'Login Sucessfully',
-            token,
-            existingUser
-        })
-        
+      const existingUser = await userModel.findOne({ email: req.body.email });
+      if (!existingUser) {
+        return res.status(404).send({
+          sucess: false,
+          messege: "Invalid Credentials",
+        });
+      }
+      //check role
+      if (existingUser.role !== req.body.role) {
+        return res.status(500).send({
+          success: false,
+          message: "role dosent match",
+        });
+      }
+
+      //comapre password
+      const comparePassword = await bcrypt.compare(
+        req.body.password,
+        existingUser.password
+      );
+      if (!comparePassword) {
+        return res.status(500).send({
+          sucess: false,
+          messge: "Invalid Credentials",
+        });
+      }
+      const token = jwt.sign(
+        { existingUserId: existingUser._id },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+      return res.status(200).send({
+        messege: "Login Sucessfully",
+        token,
+        existingUser,
+      });
     } catch (error) {
         console.log(error);
         res.status(500).send({
