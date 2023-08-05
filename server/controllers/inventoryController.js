@@ -36,4 +36,25 @@ const createInventoryController = async(req, res) => {
   }
 };
 
-module.exports = {createInventoryController}
+const getInventoryController = async (req, res) => {
+  try {
+    const inventory = await inventoryModel.find({
+      organisation: req.body.organisation,
+    }).populate('donar').populate('hospital').sort({createdAt:-1})
+    return res.status(200).send({
+      success: true,
+      message: 'get all recors sucessfully',
+      inventory,
+    })
+    
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({
+      success: false,
+      message:'Error In Get All Inventory'
+    })
+  }
+  
+}
+
+module.exports = {createInventoryController,getInventoryController}
