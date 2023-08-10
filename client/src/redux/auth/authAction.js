@@ -29,7 +29,7 @@ export const userLogin = createAsyncThunk(
 
 //register
 export const userRegister = createAsyncThunk(
-  "http://localhost:8080/api/v1/auth/register",
+  "auth/register",
   async (
     {
       name,
@@ -45,22 +45,26 @@ export const userRegister = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const { data } = await API.post("/auth/register", {
-        name,
-        role,
-        email,
-        password,
-        phone,
-        organisationName,
-        address,
-        hospitalName,
-        website,
-      });
+      const { data } = await API.post(
+        "http://localhost:8080/api/v1/auth/register",
+        {
+          name,
+          role,
+          email,
+          password,
+          phone,
+          organisationName,
+          address,
+          hospitalName,
+          website,
+        }
+      );
       if (data?.success) {
         alert("User Registerd Successfully");
-        window.location.replace("/login");
-        // toast.success("User Registerd Successfully");
+        //toast.success("User Registerd Successfully");
+         window.location.replace("/login");
       }
+      return data
     } catch (error) {
       console.log(error);
       if (error.response && error.response.data.message) {
